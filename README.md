@@ -39,4 +39,3 @@ make
 
 **Doğu Erbaş**  
 doguerbass@gmail.com
-# snake_game
