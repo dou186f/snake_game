@@ -1,20 +1,20 @@
 #include "Snake.h"
 #include "Constant.h"
 Snake::Snake() {
-    body.push_back({20, 15});
-    body.push_back({19, 15});
-    body.push_back({18, 15});
-    dir = Direction::RIGHT;
-    lastMovedDir = Direction::RIGHT;
-    isDead = false;
+	    body.push_back({20, 15});
+	    body.push_back({19, 15});
+	    body.push_back({18, 15});
+	    dir = Direction::RIGHT;
+	    lastMovedDir = Direction::RIGHT;
+	    isDead = false;
 }
 
 Snake::Snake(int startX, int startY, Direction startDir) {
-    body.push_back({startX, startY});
-    body.push_back({startX - 1, startY});
-    body.push_back({startX - 2, startY});
-    dir = startDir;
-    lastMovedDir = startDir;
+    	body.push_back({startX, startY});
+    	body.push_back({startX - 1, startY});
+    	body.push_back({startX - 2, startY});
+    	dir = startDir;
+    	lastMovedDir = startDir;
 	isDead = false;
 }
 

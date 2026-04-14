@@ -29,8 +29,10 @@ int main() {
 	Snake snake;
 	Snake snake2(10, 15, Direction::RIGHT);
 
-	float moveTimer = 0.0f;
-	float moveInterval = 0.1f;
+	float moveTimer1 = 0.0f;
+	float moveTimer2 = 0.0f;
+	float moveInterval1 = 0.1f;
+	float moveInterval2 = 0.1f;
 
 	GameState state = GameState::MENU;
 	
@@ -38,6 +40,8 @@ int main() {
 	Food food(snake);
 
 	while (!WindowShouldClose() && !shouldQuit) {
+
+		// MENU PAGE
 		if (state == GameState::MENU) {
 			if(IsKeyPressed(KEY_DOWN)) selectedButton = (selectedButton + 1) % 3;
 			if(IsKeyPressed(KEY_UP)) selectedButton = (selectedButton + 2) % 3;
@@ -48,40 +52,24 @@ int main() {
 				if (selectedButton == 2) shouldQuit = true;
 			}
 
-			Rectangle playButton = {300, 200, 200, 50};
-			Rectangle twoPlayerButton = {300, 260, 200, 50};
-			Rectangle quitButton = {300, 320, 200, 50};
-
-			Vector2 mouse = GetMousePosition();
-			if (CheckCollisionPointRec(mouse, playButton)) selectedButton = 0;
-			if (CheckCollisionPointRec(mouse, twoPlayerButton)) selectedButton = 1;
-			if (CheckCollisionPointRec(mouse, quitButton)) selectedButton = 2;
-
-			if (IsMouseButtonPressed(0)) {
-				if (selectedButton == 0) { state = GameState::PLAYING; isTwoPlayer = false; }	
-				if (selectedButton == 1) { state = GameState::TWOPLAYER; isTwoPlayer = true; }
-				if (selectedButton == 2) shouldQuit = true;
-			}
-
-			Color playColor = (selectedButton == 0) ? GREEN : DARKGREEN;
-			Color twoPlayerColor = (selectedButton == 1) ? GREEN : DARKGREEN;	
-			Color quitColor = (selectedButton == 2) ? RED : Color{139, 0, 0, 255};
-
 			BeginDrawing();
 				ClearBackground(BLACK);
-				DrawText("SNAKE GAME", 300, 150, 30, GREEN);
 				
-				DrawRectangleRec(playButton, playColor);
-				DrawText("PLAY", 370, 215, 20, BLACK);
-			
-				DrawRectangleRec(twoPlayerButton, twoPlayerColor);	
-				DrawText("VERSUS MODE", 320, 275, 20, BLACK);
+				Color playColor = (selectedButton == 0) ? GREEN : DARKGREEN;
+				Color versusColor = (selectedButton == 1) ? GREEN : DARKGREEN;	
+				Color quitColor = (selectedButton == 2) ? RED : Color{139, 0, 0, 255};
+				
+				DrawText("SNAKE GAME", 300, 165, 30, GREEN);
+				
+				DrawText("PLAY", 300, 235, 20, playColor);
+				DrawText("VERSUS MODE", 300, 295, 20, versusColor);
+				DrawText("QUIT", 300, 355, 20, quitColor);
 
-				DrawRectangleRec(quitButton, quitColor);		
-				DrawText("QUIT", 370, 335, 20, BLACK);
+				DrawText(">", 280, 235 + selectedButton * 60, 20, WHITE);
 			EndDrawing();
 		}
 		
+		// SINGLE PLAYER
 		else if (state == GameState::PLAYING) {
 			if (IsKeyPressed(KEY_UP) && snake.lastMovedDir != Direction::DOWN)
 				snake.inputBuffer.push(Direction::UP);
@@ -92,9 +80,9 @@ int main() {
 			if (IsKeyPressed(KEY_RIGHT) && snake.lastMovedDir != Direction::LEFT)	
 				snake.inputBuffer.push(Direction::RIGHT);
 			
-			moveTimer += GetFrameTime();
-			if (moveTimer >= moveInterval) {
-				moveTimer = 0.0f;
+			moveTimer1 += GetFrameTime();
+			if (moveTimer1 >= moveInterval1) {
+				moveTimer1 = 0.0f;
 				snake.move();
 			}
 
@@ -102,6 +90,7 @@ int main() {
 				snake.grow();
 				food.respawn(snake);
 				score++;
+				if (moveInterval1 > 0.05f) moveInterval1 -= 0.001f;
 			}
 	
 			if (snake.checkSelfCollision() || snake.checkWallCollision()) {
@@ -140,6 +129,7 @@ int main() {
 			EndDrawing();
 		}
 
+		// TWO PLAYER
 		else if (state == GameState::TWOPLAYER) {
 			if (IsKeyPressed(KEY_UP) && snake.lastMovedDir != Direction::DOWN)
 				snake.inputBuffer.push(Direction::UP);
@@ -159,10 +149,14 @@ int main() {
 			if (IsKeyPressed(KEY_D) && snake2.lastMovedDir != Direction::LEFT)	
 				snake2.inputBuffer.push(Direction::RIGHT);
 			
-			moveTimer += GetFrameTime();
-			if (moveTimer >= moveInterval) {
-				moveTimer = 0.0f;
+			moveTimer1 += GetFrameTime();
+			moveTimer2 += GetFrameTime();
+			if (moveTimer1 >= moveInterval1) {
+				moveTimer1 = 0.0f;
 				snake.move();
+			}
+			if (moveTimer2 >= moveInterval2) {
+				moveTimer2 = 0.0f;
 				snake2.move();
 			}
 
@@ -170,12 +164,14 @@ int main() {
 				snake.grow();
 				food.respawn(snake, &snake2);
 				score++;
+				if (moveInterval1 > 0.05f) moveInterval1 -= 0.001f;
 			}
 
 			if (snake2.body.front().x == food.position.x && snake2.body.front().y == food.position.y) {
 				snake2.grow();
 				food.respawn(snake, &snake2);
 				score2++;
+				if (moveInterval2 > 0.05f) moveInterval2 -= 0.001f;
 			}
 	
 			if (snake.checkSelfCollision() || snake.checkWallCollision() || snake.checkOtherCollision(snake2)) {
@@ -231,28 +227,42 @@ int main() {
 			EndDrawing();
 		}
 		
+		// GAME OVER PAGE
 		else if (state == GameState::GAMEOVER) {
 			BeginDrawing();
 				ClearBackground(BLACK);
            			DrawText("GAME OVER", 320, 240, 20, RED);
 
 					if (isTwoPlayer) {
-           				if (snake.isDead && !snake2.isDead)
-                			DrawText("RED WINS!", 340, 270, 20, RED);
-            			else if (snake2.isDead && !snake.isDead)
-                			DrawText("GREEN WINS!", 340, 270, 20, GREEN);
-           				else
-          					DrawText("DRAW!", 360, 270, 20, WHITE);
+           					if (snake.isDead && !snake2.isDead) {
+                					DrawText("RED WINS!", 360, 270, 20, RED);
+						}
+						else if (snake2.isDead && !snake.isDead) {
+                					DrawText("GREEN WINS!", 360, 270, 20, GREEN);
+						}
+           					else {
+							if (score > score2) {
+								DrawText("GREEN WINS!", 360, 270, 20, GREEN);
+							}
+							else if (score2 > score) {
+								DrawText("RED WINS!", 360, 270, 20, RED);
+							}
+							else {
+          							DrawText("DRAW!", 360, 270, 20, WHITE);
+							}
+						}
 
-						DrawText(TextFormat("Score Green: %d", score), 340, 300, 20, GREEN);
-						DrawText(TextFormat("Score Red: %d", score2), 340, 325, 20, RED);
-					} else {
+						DrawText(TextFormat("Score Green: %d", score), 360, 300, 20, GREEN);
+						DrawText(TextFormat("Score Red: %d", score2), 360, 325, 20, RED);
+					} 
+					else {
 						DrawText(TextFormat("Score: %d", score), 340, 300, 20, WHITE);
 					}
 					
 			        DrawText("Press ESC to go to MENU", 270, 360, 20, GRAY);
+				DrawText("Press R to RESTART", 270, 400, 20, GRAY);
 			EndDrawing();
-
+			
 			if (IsKeyPressed(KEY_ESCAPE)) {
 				snake = Snake();
 				snake2 = Snake(10, 15, Direction::RIGHT);
@@ -261,12 +271,30 @@ int main() {
 				score2 = 0;
 				snake.isDead = false;
 				snake2.isDead = false;
-				moveTimer = 0.0f;
+				moveTimer1 = 0.0f;
+				moveInterval1 = 0.1f;
+				moveTimer2 = 0.0f;
+				moveInterval2 = 0.1f;
 				isTwoPlayer = false;
 				state = GameState::MENU;
 			}
-		}
 
+			if (IsKeyPressed(KEY_R)) {
+				GameState restartState = isTwoPlayer ? GameState::TWOPLAYER : GameState::PLAYING;
+				snake = Snake();
+				snake2 = Snake(10, 15, Direction::RIGHT);
+				food.respawn(snake, &snake2);
+				score = 0;
+				score2 = 0;
+				snake.isDead = false;
+				snake2.isDead = false;
+				moveTimer1 = 0.0f;
+				moveInterval1 = 0.1f;
+				moveTimer2 = 0.0f;
+				moveInterval2 = 0.1f;
+				state = restartState;
+			}
+		}
 	}
 
 	CloseWindow();
