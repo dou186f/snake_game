@@ -8,7 +8,7 @@ include(FetchContent)
 
 FetchContent_Declare(
 	raylib
-	SOURCE_DIR ${CMAKE_SOURCE_DIR}/raylib-5.0
+	SOURCE_DIR /home/dou/Desktop/Projects/raylib-5.0
 )
 
 
