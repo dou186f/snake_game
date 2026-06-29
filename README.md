@@ -34,8 +34,3 @@ make
 - **Language:** C++
 - **Graphics:** raylib 5.0
 - **Build:** CMake
-
-## Author
-
-**Doğu Erbaş**  
-doguerbass@gmail.com
