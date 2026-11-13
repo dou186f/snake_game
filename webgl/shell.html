@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Snake Game</title>
+  <style>
+    html, body { margin: 0; background: #000; color: #ddd; }
+    body { min-height: 100vh; display: grid; place-items: center; font: 16px monospace; }
+    main { position: relative; width: min(800px, 100vw); }
+    canvas { display: block; width: 100%; height: auto; outline: none; image-rendering: pixelated; }
+    #status { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; pointer-events: none; text-align: center; }
+    #status[hidden] { display: none; }
+  </style>
+</head>
+<body>
+  <main>
+    <canvas id="canvas" width="800" height="600" tabindex="0" aria-label="Snake Game"></canvas>
+    <p id="status" role="status">Loading game...</p>
+  </main>
+  <script>
+    var canvas = document.getElementById('canvas');
+    var statusElement = document.getElementById('status');
+    canvas.addEventListener('pointerdown', function () { canvas.focus(); });
+    canvas.addEventListener('contextmenu', function (event) { event.preventDefault(); });
+    canvas.addEventListener('keydown', function (event) {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(event.key)) {
+        event.preventDefault();
+      }
+    });
+    var Module = {
+      canvas: canvas,
+      print: function () { console.log.apply(console, arguments); },
+      printErr: function () { console.error.apply(console, arguments); },
+      setStatus: function (message) {
+        statusElement.textContent = message;
+        statusElement.hidden = !message;
+      },
+      onRuntimeInitialized: function () { statusElement.hidden = true; },
+      onAbort: function () {
+        statusElement.textContent = 'The game could not be loaded. Please refresh the page.';
+        statusElement.hidden = false;
+      }
+    };
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>

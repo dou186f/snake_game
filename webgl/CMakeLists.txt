@@ -40,7 +40,9 @@ if(EMSCRIPTEN)
         SUFFIX ".html"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/site"
     )
+    set_property(TARGET snake_game APPEND PROPERTY LINK_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/shell.html")
     target_link_options(snake_game PRIVATE
+        "--shell-file" "${CMAKE_CURRENT_SOURCE_DIR}/shell.html"
         "-sUSE_GLFW=3"
         "-sASYNCIFY"
         "-sALLOW_MEMORY_GROWTH=1"
