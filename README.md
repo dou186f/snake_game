@@ -2,6 +2,8 @@
 
 A Snake game with single-player and local two-player versus modes, built in C++17 using raylib.
 
+[Play in your browser](https://dou186f.github.io/snake_game/)
+
 ## Features
 
 - **Single Player** - Eat food, grow, and increase your score as movement speeds up
