@@ -1,12 +1,11 @@
 #pragma once
 
 #include "Snake.h"
-#include "Constant.h"
 
 class Food {
 public:
-	Vector2i position;
-	
-	Food(Snake& snake);
-	void respawn(Snake& snake, Snake* snake2 = nullptr);
+    Vector2i position{};
+
+    explicit Food(const Snake& snake);
+    bool respawn(const Snake& snake, const Snake* snake2 = nullptr);
 };

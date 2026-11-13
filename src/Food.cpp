@@ -1,37 +1,35 @@
 #include "Food.h"
 #include <cstdlib>
-#include "Constant.h"
+#include <vector>
 
-Food::Food(Snake& snake) {
-	respawn(snake);
+Food::Food(const Snake& snake) {
+    respawn(snake);
 }
 
-void Food::respawn(Snake& snake, Snake* snake2) {
-
-	while(true) {
-		Vector2i newPos = {rand() % (cols - 2) + 2, rand() % (rows - 2) + 2};
-
-		bool onSnake = false;
-
-		for (auto& segment : snake.body) {
-			if (segment.x == newPos.x && segment.y == newPos.y) {
-				onSnake = true;
-				break;
-			}
-		}
-
-        if (!onSnake && snake2 != nullptr) {
-            for (auto& segment : snake2->body) {
-                if (segment.x == newPos.x && segment.y == newPos.y) {
-                    onSnake = true;
+bool Food::respawn(const Snake& snake, const Snake* snake2) {
+    std::vector<Vector2i> freeCells;
+    for (int x = 2; x < cols; ++x) {
+        for (int y = 2; y < rows; ++y) {
+            bool occupied = false;
+            for (const auto& segment : snake.body) {
+                if (segment.x == x && segment.y == y) {
+                    occupied = true;
                     break;
                 }
             }
+            if (!occupied && snake2 != nullptr) {
+                for (const auto& segment : snake2->body) {
+                    if (segment.x == x && segment.y == y) {
+                        occupied = true;
+                        break;
+                    }
+                }
+            }
+            if (!occupied) freeCells.push_back({x, y});
         }
+    }
 
-        if (!onSnake) {
-            position = newPos;
-            return;
-        }		
-	}
+    if (freeCells.empty()) return false;
+    position = freeCells[static_cast<std::size_t>(std::rand()) % freeCells.size()];
+    return true;
 }

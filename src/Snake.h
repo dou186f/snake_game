@@ -1,32 +1,34 @@
 #pragma once
 
 #include <deque>
-#include "Constant.h"
 #include <queue>
+#include "Constant.h"
 
 struct Vector2i {
-	int x, y;
+    int x, y;
 };
 
 enum class Direction {
-	UP, DOWN, LEFT, RIGHT	
+    UP, DOWN, LEFT, RIGHT
 };
 
 class Snake {
-public:	
-	std::deque<Vector2i> body;
-	std::queue<Direction> inputBuffer;
-	Direction dir;
-	Direction lastMovedDir;
-	bool isDead = false;
+public:
+    std::deque<Vector2i> body;
+    std::queue<Direction> inputBuffer;
+    Direction dir;
+    Direction lastMovedDir;
+    bool isDead = false;
 
-	Snake();
-	Snake(int startX, int startY, Direction startDir);
-	void move();
-	void grow();
-	bool checkSelfCollision();
-	bool checkWallCollision();
-	bool checkOtherCollision(Snake& otherSnake);
+    Snake();
+    Snake(int startX, int startY, Direction startDir);
+    void queueDirection(Direction direction);
+    void move();
+    void grow();
+    bool checkSelfCollision() const;
+    bool checkWallCollision() const;
+    bool checkOtherCollision(const Snake& otherSnake) const;
+
 private:
-	bool shouldGrow = false;
+    Vector2i previousTail{};
 };

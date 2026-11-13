@@ -6,7 +6,8 @@ A Snake game with single-player and local two-player versus modes, built in C++1
 
 - **Single Player** - Eat food, grow, and increase your score as movement speeds up
 - **Versus Mode** - Two players on one keyboard, with collisions between snakes
-- **Input Buffering** - Queued directional inputs
+- **Input Buffering** - Queued turns with reverse-direction protection
+- **Board Completion** - Filling the board ends the game with a win screen
 - **Menus** - Keyboard navigation, restart, and return to the menu
 
 ## Controls
@@ -19,7 +20,7 @@ A Snake game with single-player and local two-player versus modes, built in C++1
 | Restart after a round | R |
 | Return to menu after a round | Esc |
 
-In versus mode, the surviving player wins. If both lose together, the higher score wins; equal scores produce a draw.
+In versus mode, the surviving player wins. If both lose together, or the board is completed, the higher score wins; equal scores produce a draw.
 
 ## Build & Run
 

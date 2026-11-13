@@ -1,74 +1,71 @@
 #include "Snake.h"
-#include "Constant.h"
-Snake::Snake() {
-	    body.push_back({20, 15});
-	    body.push_back({19, 15});
-	    body.push_back({18, 15});
-	    dir = Direction::RIGHT;
-	    lastMovedDir = Direction::RIGHT;
-	    isDead = false;
+
+Snake::Snake() : Snake(20, 15, Direction::RIGHT) {}
+
+Snake::Snake(int startX, int startY, Direction startDir)
+    : dir(startDir), lastMovedDir(startDir) {
+    Vector2i offset{1, 0};
+    if (startDir == Direction::LEFT) offset = {-1, 0};
+    if (startDir == Direction::UP) offset = {0, -1};
+    if (startDir == Direction::DOWN) offset = {0, 1};
+    for (int i = 0; i < 3; ++i) {
+        body.push_back({startX - offset.x * i, startY - offset.y * i});
+    }
 }
 
-Snake::Snake(int startX, int startY, Direction startDir) {
-    	body.push_back({startX, startY});
-    	body.push_back({startX - 1, startY});
-    	body.push_back({startX - 2, startY});
-    	dir = startDir;
-    	lastMovedDir = startDir;
-	isDead = false;
+void Snake::queueDirection(Direction direction) {
+    Direction previous = inputBuffer.empty() ? lastMovedDir : inputBuffer.back();
+    bool opposite =
+        (previous == Direction::UP && direction == Direction::DOWN) ||
+        (previous == Direction::DOWN && direction == Direction::UP) ||
+        (previous == Direction::LEFT && direction == Direction::RIGHT) ||
+        (previous == Direction::RIGHT && direction == Direction::LEFT);
+    if (direction != previous && !opposite) {
+        inputBuffer.push(direction);
+    }
 }
 
 void Snake::move() {
-	Vector2i newHead = body.front();
-	
-	if (!inputBuffer.empty()) {
-		dir = inputBuffer.front();
-		inputBuffer.pop();
-	}
+    if (!inputBuffer.empty()) {
+        dir = inputBuffer.front();
+        inputBuffer.pop();
+    }
 
-	switch (dir) {
-		case Direction::UP:	newHead.y -= 1; break;
-		case Direction::DOWN:	newHead.y += 1; break;
-		case Direction::LEFT: 	newHead.x -= 1; break;
-		case Direction::RIGHT:	newHead.x += 1; break;
-	}
+    Vector2i head = body.front();
+    switch (dir) {
+        case Direction::UP: --head.y; break;
+        case Direction::DOWN: ++head.y; break;
+        case Direction::LEFT: --head.x; break;
+        case Direction::RIGHT: ++head.x; break;
+    }
 
-	body.push_front(newHead);
-
-	if (shouldGrow) {
-		shouldGrow = false;
-	} else {
-		body.pop_back();
-	}
-
-	lastMovedDir = dir;
+    previousTail = body.back();
+    body.push_front(head);
+    body.pop_back();
+    lastMovedDir = dir;
 }
 
 void Snake::grow() {
-	shouldGrow = true;
+    body.push_back(previousTail);
 }
 
-bool Snake::checkSelfCollision() {
-	Vector2i head = body.front();
-	for (int i = 1; i < body.size(); i++) {
-		if (body[i].x == head.x && body[i].y == head.y) {
-			return true;
-		}
-	}
-	return false;
+bool Snake::checkSelfCollision() const {
+    const Vector2i head = body.front();
+    for (std::size_t i = 1; i < body.size(); ++i) {
+        if (body[i].x == head.x && body[i].y == head.y) return true;
+    }
+    return false;
 }
 
-bool Snake::checkOtherCollision(Snake& otherSnake) {
-	Vector2i head = body.front();
-	for (int i = 0; i < otherSnake.body.size(); i++) {
-		if (otherSnake.body[i].x == head.x && otherSnake.body[i].y == head.y) {
-			return true;
-		}
-	}
-	return false;
+bool Snake::checkOtherCollision(const Snake& otherSnake) const {
+    const Vector2i head = body.front();
+    for (const auto& segment : otherSnake.body) {
+        if (segment.x == head.x && segment.y == head.y) return true;
+    }
+    return false;
 }
 
-bool Snake::checkWallCollision() {
-	Vector2i head = body.front();
-	return head.x < 2 || head.x >= cols || head.y < 2 || head.y >= rows;
+bool Snake::checkWallCollision() const {
+    const Vector2i head = body.front();
+    return head.x < 2 || head.x >= cols || head.y < 2 || head.y >= rows;
 }
