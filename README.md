@@ -1,36 +1,54 @@
 # Snake Game
 
-A Snake game with single-player and local two-player versus modes, built in C++ using raylib.
+A Snake game with single-player and local two-player versus modes, built in C++17 using raylib.
 
 ## Features
 
-- **Single Player** — Classic snake gameplay with score tracking
-- **Versus Mode** — Two players on the same keyboard, collision detection between snakes
-- **Input Buffering** — Queued directional inputs prevent missed keypresses at high speed
-- **Menu & Game Over screens** — Keyboard and mouse navigation
+- **Single Player** - Eat food, grow, and increase your score as movement speeds up
+- **Versus Mode** - Two players on one keyboard, with collisions between snakes
+- **Input Buffering** - Queued directional inputs
+- **Menus** - Keyboard navigation, restart, and return to the menu
 
 ## Controls
 
-| Action | Player 1 | Player 2 |
-|---|---|---|
-| Move | Arrow Keys | W A S D |
+| Action | Key |
+|---|---|
+| Player 1 movement | Arrow keys |
+| Player 2 movement | W / A / S / D |
+| Menu selection | Up / Down, then Enter |
+| Restart after a round | R |
+| Return to menu after a round | Esc |
 
-## Build
+In versus mode, the surviving player wins. If both lose together, the higher score wins; equal scores produce a draw.
 
-Requires CMake 3.16+ and raylib 5.0 source placed locally.
+## Build & Run
 
-1. Download raylib 5.0 source from [raylib releases](https://github.com/raysan5/raylib/releases/tag/5.0) and place the folder as `raylib-5.0/` in the project root.
-2. Build:
+Requires CMake 3.21+ and a C++17 compiler. Raylib 5.0 is downloaded automatically during the first configuration.
+
+Run from the project root.
+
+### Windows (MinGW-w64)
+
+Have MinGW-w64's `gcc`, `g++`, and `mingw32-make` on your PATH, before any other GCC installation.
+
+```powershell
+cmake -S . -B build-mingw -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+cmake --build build-mingw
+.\build-mingw\snake_game.exe
+```
+
+### Linux / macOS
 
 ```bash
-mkdir build && cd build
-cmake ..
-make
-./snake_game
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+./build/snake_game
 ```
+
+Linux requires the [raylib system dependencies](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux). On macOS, use the Xcode command-line tools.
 
 ## Tech Stack
 
-- **Language:** C++
+- **Language:** C++17
 - **Graphics:** raylib 5.0
 - **Build:** CMake

@@ -1,0 +1,14 @@
+/build/
+/build-*/
+/raylib-*/
+/.vs/
+/.idea/
+.vsconfig
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.exe
+*.o
+*.obj
+/webgl/build/
+/webgl/site/

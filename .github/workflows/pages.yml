@@ -1,0 +1,52 @@
+name: Build and Publish Snake WebGL
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "webgl/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Emscripten
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: '3.1.74'
+      - name: Configure WebGL
+        run: emcmake cmake -S webgl -B webgl/build -DCMAKE_BUILD_TYPE=Release
+      - name: Build WebGL
+        run: cmake --build webgl/build --parallel 2
+      - name: Check browser build
+        run: |
+          test -s webgl/site/index.html
+          test -s webgl/site/index.js
+          test -s webgl/site/index.wasm
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: webgl/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - uses: actions/deploy-pages@v4
+        id: deployment
